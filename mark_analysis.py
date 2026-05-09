@@ -1,5 +1,3 @@
-numpy using num
-
 print("Course: Python Programming")
 print("\nEnter data for THREE(3) students only.")
 
