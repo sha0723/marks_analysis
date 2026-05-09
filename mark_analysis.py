@@ -1,59 +1,106 @@
-print("Course: Python Programming")
-print("\nEnter data for THREE(3) students only.")
+import streamlit as st
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
-std=i; i=0; i<3;
-print("Student 1")
-print("\nEnter Student Name 1")
-<type=textinput text=student_name>
+# Title
+st.title("Student Marks Analysis System")
 
-print("\nSelect Gender 1")
-<type=radiobutton text=Male>Male;
-<type=radiobutton text=Female>Female;
+# Lists to store data
+student_names = []
+genders = []
+marks_list = []
 
-print("\nEnter Marks 1")
-<type=numberinput text=marks>
-if{
-(marks=>50)
-print("Pass")
-}
-else{
-(marks<50)
-print("Fail")
-}
+# Input for 3 students
+for i in range(3):
 
-pprint("Student 2")
-print("\nEnter Student Name 2")
-<type=textinput text=student_name>
+    st.header(f"Student {i+1}")
 
-print("\nSelect Gender 2")
-<type=radiobutton text=Male>Male;
-<type=radiobutton text=Female>Female;
+    name = st.text_input(f"Enter Student Name {i+1}")
 
-print("\nEnter Marks 2")
-if{
-(marks=>50)
-print("Pass")
-}
-else{
-(marks<50)
-print("Fail")
-}
+    gender = st.radio(
+        f"Select Gender {i+1}",
+        ("Male", "Female"),
+        key=i
+    )
 
-print("Student 3")
-print("\nEnter Student Name 3")
-<type=textinput text=student_name>
+    marks = st.number_input(
+        f"Enter Marks {i+1}",
+        min_value=0,
+        max_value=100,
+        step=1,
+        key=str(i)
+    )
 
-print("\nSelect Gender 3")
-<type=radiobutton text=Male>Male;
-<type=radiobutton text=Female>Female;
+    submit = st.button(f"Submit Student {i+1}")
 
-print("\nEnter Marks 3")
-if{
-(marks=>50)
-print("Pass")
-}
-else{
-(marks<50)
-print("Fail")
-}
-<type=button text=submit>Submit;
+    if submit:
+
+        try:
+
+            # Exception handling
+            if name == "":
+                raise ValueError("Student name cannot be empty!")
+
+            student_names.append(name)
+            genders.append(gender)
+            marks_list.append(marks)
+
+            st.success("Student data added successfully!")
+
+        except ValueError as e:
+            st.error(e)
+
+
+# Process when 3 students entered
+if len(marks_list) == 3:
+
+    # NumPy Array
+    marks_array = np.array(marks_list)
+
+    # Analysis
+    mean_marks = np.mean(marks_array)
+    max_marks = np.max(marks_array)
+
+    st.subheader("Marks Analysis")
+    st.write("Mean Marks :", round(mean_marks, 2))
+    st.write("Maximum Marks :", max_marks)
+
+    # Result classification
+    results = []
+
+    for mark in marks_list:
+
+        if mark >= 50:
+            results.append("Pass")
+        else:
+            results.append("Fail")
+
+    # Pandas DataFrame
+    data = {
+        "Student Name": student_names,
+        "Gender": genders,
+        "Marks": marks_list,
+        "Result": results
+    }
+
+    df = pd.DataFrame(data)
+
+    # Sorting ascending order
+    df = df.sort_values(by="Marks")
+
+    st.subheader("Student Records")
+    st.dataframe(df)
+
+    # Graph
+    st.subheader("Marks Graph")
+
+    fig, ax = plt.subplots()
+
+    ax.bar(student_names, marks_list)
+
+    ax.set_xlabel("Student Name")
+    ax.set_ylabel("Marks")
+    ax.set_title("Student Marks")
+
+    st.pyplot(fig)
